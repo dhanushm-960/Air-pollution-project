@@ -1,40 +1,40 @@
-# 🌍 Air Pollution Prediction and AQI Trend Analysis (Delhi)
+# 🌍 Air Pollution Prediction and Safety Classification (Delhi)
 
 ## 📌 Overview
 
 This project builds a machine learning system to:
 
 * Predict the **Air Quality Index (AQI) for the next day**
-* Determine whether air pollution will **increase or decrease**
+* Classify whether the air quality will be **Safe or Dangerous**
 
-The project focuses on creating a **realistic, data-driven pipeline** using historical AQI trends and contextual features.
+The system uses **historical AQI trends and contextual features** instead of direct pollutant values, making it more realistic and applicable for decision-making.
 
 ---
 
 ## 🎯 Objectives
 
 * Predict **future AQI values** using regression models
-* Classify **pollution trends** (increase/decrease)
-* Use **feature engineering** instead of direct pollutant data
-* Build a **connected ML pipeline** (regression → classification)
+* Classify **air quality safety (Safe/Dangerous)**
+* Use **feature engineering** instead of direct AQI formula recreation
+* Build a **practical ML system for real-world use**
 
 ---
 
 ## 📊 Dataset
 
 * File: `city_day.csv`
-* Source: Air quality data for Indian cities
+* Contains daily air quality data for Indian cities
 
 ### Data Used
 
 * Only **Delhi** data is selected
-* Each row represents **daily AQI information**
+* Each row represents **one day**
 
 ---
 
 ## 🧠 Feature Engineering
 
-Instead of using pollutant values directly, the following features are created:
+Instead of directly using pollutant values, the project uses derived features:
 
 ### ⏱ Time Features
 
@@ -52,9 +52,9 @@ Instead of using pollutant values directly, the following features are created:
 
 ### 🏭 Industrial Activity
 
-* Higher in winter
+* Simulated using season (higher in winter)
 
-### 🔁 Lag Features
+### 🔁 Lag Features (Most Important)
 
 * AQI_prev_1
 * AQI_prev_2
@@ -64,27 +64,32 @@ Instead of using pollutant values directly, the following features are created:
 
 ## 🎯 Target Variables
 
-### 🔵 Regression
+### 🔵 Regression Target
 
-* **AQI_next_day** → Predict next day's AQI
+* **AQI_next_day** → Predict next day AQI
 
-### 🟢 Classification
+---
 
-* **Trend_Label**
+### 🟢 Classification Target
 
-  * 1 → AQI increases
-  * 0 → AQI decreases
+* **Safety_Label**
+
+  * 1 → Dangerous
+  * 0 → Safe
+
+👉 Important:
+AQI is used **only to create labels**, not as input to the classification model.
 
 ---
 
 ## ⚙️ Models Used
 
-### Regression Models
+### Regression
 
 * Linear Regression
 * KNN Regression
 
-### Classification Models
+### Classification
 
 * Logistic Regression
 * KNN Classification
@@ -93,17 +98,21 @@ Instead of using pollutant values directly, the following features are created:
 
 ## 🔗 Project Pipeline
 
+### 🔵 Regression Pipeline
+
 ```
-Raw Features
-   ↓
-Feature Engineering
-   ↓
-Regression Model (Predict AQI_next_day)
-   ↓
-Classification Model (Predict Trend)
+Features → Regression Model → AQI_next_day
 ```
 
-👉 Classification uses **predicted AQI**, not raw features.
+---
+
+### 🟢 Classification Pipeline
+
+```
+Features → Classification Model → Safe / Dangerous
+```
+
+👉 Classification does **not use AQI directly**, it learns from patterns in features.
 
 ---
 
@@ -115,27 +124,47 @@ Classification Model (Predict Trend)
 * MAE
 * R² Score
 
+---
+
 ### Classification
 
 * Accuracy
 * Precision
 * Recall
 * F1 Score
+* Confusion Matrix
 
 ---
 
-## 📊 Results
+## 📊 Visualizations
+
+### Regression
+
+* Actual vs Predicted AQI (with reference line)
+* Error distribution
+
+### Classification
+
+* Confusion matrix
+* Accuracy comparison (Logistic vs KNN)
+
+---
+
+## 📊 Results Summary
 
 ### Regression
 
 * Linear Regression performed best
-* R² ≈ 0.89
+* R² ≈ 0.89 (high accuracy)
 * Average error ≈ 28 AQI units
+
+---
 
 ### Classification
 
-* KNN Classification performed best
-* Accuracy ≈ 67%
+* KNN performed better than Logistic Regression
+* Accuracy ≈ 65–68%
+* Able to reasonably detect dangerous air conditions
 
 ---
 
@@ -143,35 +172,48 @@ Classification Model (Predict Trend)
 
 * Removed direct pollutant-based prediction
 * Introduced feature engineering
-* Shifted from current AQI to **future AQI prediction**
-* Redesigned classification to predict **trend instead of category**
-* Built a **connected pipeline** instead of independent models
+* Shifted to **future AQI prediction**
+* Redesigned classification to **Safe vs Dangerous**
+* Built a **true ML model instead of rule-based thresholding**
+
+---
+
+## ⚠️ Important Concept
+
+Although safety labels are created using an AQI threshold:
+
+```
+AQI > 200 → Dangerous
+```
+
+👉 The model **does NOT use this rule directly**.
+Instead, it learns patterns from features such as past AQI, season, and traffic.
 
 ---
 
 ## 🌍 Applications
 
-* Pollution monitoring systems
-* Government planning
-* Smart city systems
-* Public health alerts
+* Public health awareness (mask recommendations)
+* Smart city monitoring
+* Government decision systems
+* Pollution alerts
 
 ---
 
 ## ⚠️ Limitations
 
-* Uses daily data (not hourly)
-* Some features are simulated (traffic, industry)
+* Daily data (not hourly)
+* Some features are simulated
 * Classification accuracy is moderate
 
 ---
 
-## 🚀 Future Work
+## 🚀 Future Improvements
 
-* Use real-time or hourly data
-* Include weather data
-* Improve classification accuracy
-* Add real traffic and industrial datasets
+* Use real-time AQI data
+* Add weather features (temperature, humidity, wind)
+* Improve classification models
+* Deploy as real-time system
 
 ---
 
@@ -193,12 +235,8 @@ python main.py
 
 ## 💡 Summary
 
-This project predicts next-day AQI in Delhi and determines whether pollution will increase or decrease using historical trends and contextual features.
+This project predicts next-day AQI and classifies whether air quality will be safe or dangerous using machine learning and feature engineering.
 
 ---
 
-## 👨‍💻 Author
 
-Dhanush M
-
----

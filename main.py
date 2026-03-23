@@ -5,6 +5,7 @@ from src.classification import run_classification
 
 from sklearn.model_selection import train_test_split
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # 1️⃣ Load data
 df = load_data("data/city_day.csv")
@@ -20,45 +21,54 @@ df = add_traffic(df)
 df = add_industry(df)
 df = add_lag_features(df)
 
-# 4️⃣ Create Targets
+# 4️⃣ Create targets
 df['AQI_next_day'] = df['AQI'].shift(-1)
 
-df['AQI_trend'] = df['AQI_next_day'] - df['AQI']
-df['Trend_Label'] = df['AQI_trend'].apply(lambda x: 1 if x > 0 else 0)
+# 🔥 Classification target (Safe / Dangerous)
+df['Safety_Label'] = df['AQI_next_day'].apply(
+    lambda x: 1 if x > 200 else 0
+)
 
-# 5️⃣ Final Processing
+# 5️⃣ Final processing
 df = final_processing(df)
 
-# 🔥 6️⃣ KEEP ONLY NUMERIC FEATURES (IMPORTANT FIX)
+# 6️⃣ Prepare regression data
 X = df.select_dtypes(include=['number'])
+X = X.drop(['AQI','AQI_next_day','Safety_Label'], axis=1)
 
-# Remove target columns
-X = X.drop(['AQI','AQI_next_day','AQI_trend','Trend_Label'], axis=1)
-
-# Regression target
 y_reg = df['AQI_next_day']
 
-# 7️⃣ Train-Test Split
+# 7️⃣ Train-test split (Regression)
 X_train, X_test, y_train_reg, y_test_reg = train_test_split(
     X, y_reg, test_size=0.2, random_state=42
 )
 
-# 🔵 REGRESSION
-y_pred_reg = run_regression(X_train, X_test, y_train_reg, y_test_reg)
+# 🔵 Run Regression
+run_regression(X_train, X_test, y_train_reg, y_test_reg)
 
-# 🟢 CLASSIFICATION INPUT (NEW PIPELINE)
+# ==============================
+# 🟢 CLASSIFICATION PART (FIXED)
+# ==============================
 
-# Previous AQI values
-AQI_prev_test = df.loc[X_test.index, 'AQI_prev_1']
+# Use all features
+X_class = X
+y_class = df['Safety_Label']
 
-# Build classification dataset
-X_class = pd.DataFrame({
-    'Predicted_AQI': y_pred_reg,
-    'AQI_prev': AQI_prev_test
-})
+# 🔥 Train-test split (IMPORTANT FIX)
+X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(
+    X_class, y_class, test_size=0.2, random_state=42
+)
 
-# Classification target
-y_class = df.loc[X_test.index, 'Trend_Label']
+# 🟢 Run Classification
+run_classification(X_train_c, X_test_c, y_train_c, y_test_c)
 
-# 🟢 CLASSIFICATION
-run_classification(X_class, y_class)
+# ==============================
+# 📊 EXTRA GRAPH
+# ==============================
+
+plt.figure()
+plt.plot(df['AQI'])
+plt.title("AQI Trend Over Time")
+plt.xlabel("Time")
+plt.ylabel("AQI")
+plt.show()
